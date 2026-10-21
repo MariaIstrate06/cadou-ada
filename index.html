@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ada, de mâine înoți!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tile-deep: #0E5A8A;
+    --tile-light: #2F93C4;
+    --grout: #BFE9F7;
+    --rope-red: #E2412F;
+    --rope-white: #FFFFFF;
+    --card: #FFFFFF;
+    --ink: #0A2C42;
+    --ink-soft: #3F6178;
+    --bubble: #D9FDD3;
+    --bubble-ink: #10331F;
+    --button: #0A2C42;
+    --button-ink: #FFFFFF;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --tile-deep: #062B44;
+      --tile-light: #0F4A6E;
+      --grout: #3C86AD;
+      --rope-red: #D23A2A;
+      --rope-white: #E6EEF2;
+      --card: #0D2233;
+      --ink: #EAF6FC;
+      --ink-soft: #A9C5D6;
+      --bubble: #134D37;
+      --bubble-ink: #E3F7EA;
+      --button: #EAF6FC;
+      --button-ink: #0A2C42;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --tile-deep: #062B44;
+    --tile-light: #0F4A6E;
+    --grout: #3C86AD;
+    --rope-red: #D23A2A;
+    --rope-white: #E6EEF2;
+    --card: #0D2233;
+    --ink: #EAF6FC;
+    --ink-soft: #A9C5D6;
+    --bubble: #134D37;
+    --bubble-ink: #E3F7EA;
+    --button: #EAF6FC;
+    --button-ink: #0A2C42;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: inherit; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--tile-deep);
+    color: var(--ink);
+    font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* The pool floor: a tile grid, wobbled by "water" */
+  .pool {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .pool .floor { fill: var(--tile-light); }
+  .pool .lines { stroke: var(--grout); }
+  .pool .lane { fill: var(--tile-deep); }
+
+  main {
+    position: relative;
+    z-index: 1;
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 64px 20px 48px;
+  }
+
+  /* Lane rope floating across the top of the card */
+  .rope {
+    height: 22px;
+    margin: 0 -28px 0;
+    background:
+      radial-gradient(circle at 11px 11px, var(--rope-red) 9px, transparent 10px) 0 0 / 44px 22px repeat-x,
+      radial-gradient(circle at 11px 11px, var(--rope-white) 9px, transparent 10px) 22px 0 / 44px 22px repeat-x;
+    filter: drop-shadow(0 3px 0 rgba(0,0,0,.18));
+    transform: translateY(-11px);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card);
+    border-radius: 120px 120px 28px 28px; /* a kickboard silhouette */
+    padding: 0 28px 32px;
+    box-shadow: 0 30px 60px -20px rgba(3, 30, 50, .55);
+    text-align: center;
+    animation: float-in 900ms cubic-bezier(.2,.8,.2,1) both;
+  }
+  .card-inner { padding-top: 34px; }
+
+  h1 {
+    font-size: clamp(2.6rem, 9vw, 3.6rem);
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+  }
+  .gift {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    margin: 0 auto 28px;
+    max-width: 32ch;
+  }
+
+  .preview {
+    text-align: left;
+    margin: 0 0 26px;
+  }
+  .preview p.hint {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  .bubble {
+    position: relative;
+    background: var(--bubble);
+    color: var(--bubble-ink);
+    border-radius: 14px 14px 4px 14px;
+    padding: 12px 14px;
+    font-size: 0.98rem;
+    line-height: 1.45;
+    margin: 0 0 0 24px;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 22px;
+    border-radius: 999px;
+    background: var(--button);
+    color: var(--button-ink);
+    font-weight: 500;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    font-family: inherit;
+    text-decoration: none;
+    transition: transform 120ms ease;
+  }
+  .cta:hover { transform: translateY(-2px); }
+  .cta:active { transform: translateY(1px); }
+  .cta:focus-visible { outline: 3px solid var(--rope-red); outline-offset: 4px; }
+  .cta svg { width: 22px; height: 22px; flex: none; }
+
+  .after {
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    margin: 14px 0 0;
+  }
+  .from {
+    margin: 26px 0 0;
+    font-weight: 600;
+  }
+
+  @keyframes float-in {
+    from { opacity: 0; transform: translateY(40px) rotate(-1.5deg); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; }
+    .pool animate { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg class="pool" aria-hidden="true" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 800">
+  <defs>
+    <pattern id="tiles" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path class="lines" d="M40 0H0V40" fill="none" stroke-width="2"/>
+    </pattern>
+    <filter id="water" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="4" result="noise">
+        <animate attributeName="baseFrequency" dur="14s" values="0.012 0.018;0.016 0.013;0.012 0.018" repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <g filter="url(#water)">
+    <rect class="floor" x="-40" y="-40" width="880" height="880"/>
+    <rect x="-40" y="-40" width="880" height="880" fill="url(#tiles)"/>
+    <!-- lane marking on the pool floor -->
+    <rect class="lane" x="380" y="-40" width="40" height="880"/>
+    <rect class="lane" x="300" y="680" width="200" height="40"/>
+  </g>
+</svg>
+
+<main>
+  <article class="card">
+    <div class="rope" aria-hidden="true"></div>
+    <div class="card-inner">
+      <h1>Ada, de mâine înoți!</h1>
+      <p class="gift">La mulți ani fericiți și minunați.</p>
+
+      <a class="cta" id="book" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.2c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm5.8 14.03c-.25.69-1.44 1.32-1.98 1.37-.51.06-1.15.08-1.85-.12-.43-.14-.97-.31-1.67-.61-2.94-1.27-4.86-4.23-5-4.43-.15-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.29.59-.37.79-.37h.57c.18 0 .43-.07.67.51.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.29.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.36 1.46.29.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.29.15.49.22.56.34.07.12.07.71-.18 1.4Z"/></svg>
+        Apasă aici și programează-te!
+      </a>
+      <p class="after">Tu doar apeși „Trimite”.</p>
+
+      <p class="from" id="from"></p>
+    </div>
+  </article>
+</main>
+
+<script>
+  // ——— Edit these two lines ———
+  const PHONE = "40757104293";          // international format, no + or spaces
+  const FROM  = "Cu drag, Elips";
+
+  const MESSAGE = "Bună ziua! Sunt Ada Axinte, am primit cadou de la prietena mea o ședință de lecții de înot și mi-a spus să vă dau un mesaj să putem programa. Când ați avea disponibilitate?";
+
+  document.getElementById("from").textContent = FROM;
+  document.getElementById("book").href =
+    "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(MESSAGE);
+</script>
+</body>
+</html>
